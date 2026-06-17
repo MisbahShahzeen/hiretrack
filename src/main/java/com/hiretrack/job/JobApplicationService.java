@@ -3,7 +3,7 @@ package com.hiretrack.job;
 import com.hiretrack.user.User;
 import com.hiretrack.user.UserRepository;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Sort;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,10 +30,19 @@ public class JobApplicationService {
         return jobApplicationRepository.save(application);
     }
 
-    public List<JobApplication> listForUser(String email) {
+    public List<JobApplication> listForUser(String email, ApplicationStatus status, String sortBy) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return jobApplicationRepository.findByUser(user);
+
+        // Default sort field if none given; sort descending (newest/Z-first)
+        String sortField = (sortBy == null || sortBy.isBlank()) ? "appliedDate" : sortBy;
+        Sort sort = Sort.by(Sort.Direction.DESC, sortField);
+
+        // The one clean branch: filtered vs unfiltered
+        if (status == null) {
+            return jobApplicationRepository.findByUser(user, sort);
+        }
+        return jobApplicationRepository.findByUserAndStatus(user, status, sort);
     }
 
     public JobApplication update(String email, Long id, String company, String role, ApplicationStatus status) {

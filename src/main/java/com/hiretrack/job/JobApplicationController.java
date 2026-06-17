@@ -1,5 +1,5 @@
 package com.hiretrack.job;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,9 +39,13 @@ public class JobApplicationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<JobApplicationResponse>> list(Principal principal) {
+    public ResponseEntity<List<JobApplicationResponse>> list(
+            @RequestParam(required = false) ApplicationStatus status,
+            @RequestParam(required = false) String sortBy,
+            Principal principal) {
+
         List<JobApplicationResponse> applications =
-                jobApplicationService.listForUser(principal.getName())
+                jobApplicationService.listForUser(principal.getName(), status, sortBy)
                         .stream()
                         .map(JobApplicationResponse::new)
                         .toList();
