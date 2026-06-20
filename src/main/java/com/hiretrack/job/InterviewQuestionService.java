@@ -58,7 +58,7 @@ public class InterviewQuestionService {
     // Dig the generated text out of Gemini's nested response:
     // candidates[0].content.parts[0].text
     @SuppressWarnings("unchecked")
-    private String extractText(Map<String, Object> response) {
+    String extractText(Map<String, Object> response) {
         try {
             List<Map<String, Object>> candidates =
                     (List<Map<String, Object>>) response.get("candidates");
