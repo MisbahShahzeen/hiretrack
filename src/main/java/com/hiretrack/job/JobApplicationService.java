@@ -59,6 +59,9 @@ public class JobApplicationService {
         JobApplication application = getOwnedApplication(email, id);
         jobApplicationRepository.delete(application);
     }
+    public JobApplication getOwnedApplicationForUser(String email, Long id) {
+        return getOwnedApplication(email, id);
+    }
 
     // Fetches an application only if it belongs to the given user.
     // Treats "not yours" the same as "doesn't exist" (no information leak).

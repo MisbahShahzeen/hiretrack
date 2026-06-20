@@ -18,9 +18,12 @@ import java.util.List;
 public class JobApplicationController {
 
     private final JobApplicationService jobApplicationService;
+    private final InterviewQuestionService interviewQuestionService;
 
-    public JobApplicationController(JobApplicationService jobApplicationService) {
+    public JobApplicationController(JobApplicationService jobApplicationService,
+                                    InterviewQuestionService interviewQuestionService) {
         this.jobApplicationService = jobApplicationService;
+        this.interviewQuestionService = interviewQuestionService;
     }
 
     @PostMapping
@@ -72,5 +75,26 @@ public class JobApplicationController {
     public ResponseEntity<Void> delete(@PathVariable Long id, Principal principal) {
         jobApplicationService.delete(principal.getName(), id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/interview-questions")
+    public ResponseEntity<InterviewQuestionsResponse> generateInterviewQuestions(
+            @PathVariable Long id,
+            Principal principal) {
+
+        JobApplication application =
+                jobApplicationService.getOwnedApplicationForUser(principal.getName(), id);
+
+        String questions = interviewQuestionService.generateQuestions(
+                application.getCompany(),
+                application.getRole());
+
+        InterviewQuestionsResponse response = new InterviewQuestionsResponse(
+                application.getId(),
+                application.getCompany(),
+                application.getRole(),
+                questions);
+
+        return ResponseEntity.ok(response);
     }
 }
